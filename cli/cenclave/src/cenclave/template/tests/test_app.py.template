@@ -1,11 +1,7 @@
 """Unit test for our app."""
-import base64
-import json
 
-import pytest
 import requests
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+
 
 def test_hello(url, certificate):
     """Test get method on /."""
