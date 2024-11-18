@@ -1,0 +1,26 @@
+# Ignore Cosmian Enclave CLI files/directories
+config.toml
+secrets.json
+secrets_to_seal.json
+.cenclaveignore
+
+# Ignore byte-compiled / optimized files
+__pycache__
+*.py[cod]
+
+# Ignore git files/directories
+.git*
+
+# Ignore IDE files/directories
+.vscode/
+.idea/
+
+# Ignore packaging files/directories
+*.egg-info/
+*.egg
+
+# Ignore virtual env directories
+.venv
+
+# Ignore files which can contain secrets
+.env

@@ -1,0 +1,3 @@
+"""globs module."""
+
+POOL: list = []
