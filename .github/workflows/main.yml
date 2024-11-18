@@ -1,0 +1,18 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        packages: [
+          {name: cenclave, root: cli}
+        ]
+    name: ${{ matrix.packages.name }}
+    secrets: inherit
+    uses: ./.github/workflows/python.yml
+    with:
+      module-name: ${{ matrix.packages.name }}
+      root-path: ${{ matrix.packages.root }}

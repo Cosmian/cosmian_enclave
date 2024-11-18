@@ -1,0 +1,9 @@
+name = "{{ name }}"
+python_application = "app:app"
+healthcheck_endpoint = "/health"
+tests_cmd = "pytest"
+tests_requirements = [
+    "cryptography",
+    "intel-sgx-ra",
+    "pytest",
+]

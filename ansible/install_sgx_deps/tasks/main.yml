@@ -1,0 +1,58 @@
+---
+# tasks file for install_sgx_deps
+
+- name: Add official Intel APT repository
+  block:
+    - name: Download Intel GPG public key
+      ansible.builtin.apt_key:
+        state: present
+        url: https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
+        keyring: /etc/apt/trusted.gpg.d/intel.gpg
+
+    - name: Add Intel APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/intel.gpg] https://download.01.org/intel-sgx/sgx_repo/ubuntu {{ ansible_distribution_release }} main"
+        state: present
+        filename: intel
+        update_cache: yes
+
+- name: Install Intel SGX packages
+  ansible.builtin.apt:
+    pkg:
+    - libsgx-launch
+    - libsgx-urts
+    - libsgx-quote-ex
+    - libsgx-epid
+    - libsgx-dcap-ql
+    - libsgx-dcap-quote-verify
+    - libsgx-dcap-default-qpl
+    - linux-base-sgx
+    - sgx-aesm-service
+    - libsgx-aesm-quote-ex-plugin
+    state: present
+    install_recommends: no
+
+- name: Stop AESMD
+  ansible.builtin.systemd_service:
+    name: aesmd
+    state: stopped
+
+- name: Edit sgx_default_qcnl.conf
+  ansible.builtin.template:
+    src: sgx_default_qcnl.conf.j2
+    dest: /etc/sgx_default_qcnl.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags: qcnl
+
+- name: Add aesmd user to sgx_prv group
+  ansible.builtin.user:
+    name: aesmd
+    groups: sgx_prv
+    append: yes
+
+- name: Start AESMD
+  ansible.builtin.systemd_service:
+    name: aesmd
+    state: restarted

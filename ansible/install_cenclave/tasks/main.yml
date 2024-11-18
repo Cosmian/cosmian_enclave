@@ -1,0 +1,26 @@
+---
+# tasks file for install_cenclave
+
+- name: Create a directory if it does not exist
+  become: false
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.config/gramine"
+    state: directory
+    mode: '0755'
+
+# Mandatory to use exponent 3 instead of default 65537
+- name: Enclave RSA private key generation
+  become: false
+  ansible.builtin.command:
+    argv:
+      - openssl
+      - genrsa
+      - -3
+      - -out
+      - "/home/{{ ansible_user }}/.config/gramine/enclave-key.pem"
+      - 3072
+
+- name: Install Cosmian Enclave CLI
+  pip:
+    name : cenclave
+    extra_args: --upgrade

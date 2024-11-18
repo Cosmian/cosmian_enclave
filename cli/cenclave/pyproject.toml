@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=68.0.0,<76.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cenclave"
+authors = [
+    { name = "Cosmian Tech", email = "tech@cosmian.com" },
+]
+description = "Command Line Interface for Cosmian Enclave"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython"
+]
+dependencies = [
+    "cryptography>=43.0.3,<44.0.0",
+    "docker>=7.1.0,<8.0.0",
+    "intel-sgx-ra>=2.3.1,<3.0.0",
+    "jinja2>=3.1.4,<3.2.0",
+    "cenclave-lib-crypto>=1.0.0,<2.0.0",
+    "pydantic>=1.10.18,<2.0.0",
+    "pyjwt>=2.9.0,<3.0.0",
+    "requests>=2.32.3,<2.33.0",
+    "toml>=0.10.2,<0.11.0",
+    "urllib3>=2.2.3,<3.0.0",
+    "importlib-resources>=6.4.5,<7.0.0"
+]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://cosmian.com"
+documentation = "https://docs.cosmian.com"
+repository = "https://github.com/Cosmian/cosmian-enclave"
+
+[tool.setuptools.dynamic]
+version = { attr = "cenclave.__version__" }
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.10.0,<25.0.0",
+    "isort>=5.13.2,<6.0.0",
+    "pylint>=3.3.1,<4.0.0",
+    "pycodestyle>=2.12.1,<3.0.0",
+    "pydocstyle>=6.3.0,<7.0.0",
+    "mypy>=1.13.0,<2.0.0",
+    "pytest>=8.3.3,<9.0.0",
+    "build>=1.2.2,<1.3.0",
+    "wheel>=0.45.0,<0.50.0",
+    "flask==3.1.0",
+    "types-requests>=2.32.0,<2.33.0",
+    "types-urllib3>=1.26.0,<1.27.0",
+    "types-toml>=0.10.0,<0.11.0",
+    "types-setuptools>=75.0.0,<76.0.0"
+]
+
+[project.scripts]
+cenclave = "cenclave.main:main"
+
+[tool.pylint.MAIN]
+disable = [
+    "C0103", # invalid-name
+    "R0801", # duplicate-code
+    "R0913", # too-many-arguments
+    "R0902", # too-many-instance-attributes
+    "R0903"  # too-few-public-methods
+]
+extension-pkg-whitelist = "pydantic"
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--strict-markers"
+testpaths = ["tests"]
+pythonpath = "src"
+markers = [
+    "incremental",
+    "sgx: mark tests requiring a well-configured SGX machine with Cosmian Enclave",
+]
+
+[[tool.mypy.overrides]]
+module = "docker.*"
+ignore_missing_imports = true

@@ -1,0 +1,20 @@
+"""Unit test for our app."""
+import base64
+import json
+
+import pytest
+import requests
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+
+def test_hello(url, certificate):
+    """Test get method on /."""
+    response = requests.get(url, timeout=10, verify=certificate)
+    assert response.status_code == 200
+    assert b"Hello world" in response.content
+
+
+def test_health(url, certificate):
+    """Test healthcheck endpoint."""
+    response = requests.get(f"{url}{{ healthcheck_endpoint }}", timeout=10, verify=certificate)
+    assert response.status_code == 200
