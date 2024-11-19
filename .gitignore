@@ -3,7 +3,6 @@ TODO.md
 .idea/
 .python-version
 .env*
-examples
 workspace
 
 .DS_Store

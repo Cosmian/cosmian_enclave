@@ -1,0 +1,9 @@
+name = "yaos_millionaires"
+python_application = "app:app"
+healthcheck_endpoint = "/health"
+tests_cmd = "pytest"
+tests_requirements = [
+    "intel-sgx-ra",
+    "cenclave-lib-crypto",
+    "pytest"
+]
