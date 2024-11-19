@@ -2,11 +2,10 @@
 
 import os
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 import pytest
-from cryptography import x509
-from intel_sgx_ra.ratls import get_server_certificate
+from intel_sgx_ra.ratls import get_server_certificate, url_parse
 
 
 @pytest.fixture(scope="module")
@@ -34,29 +33,22 @@ def workspace(tmp_path_factory) -> Path:
 
 
 @pytest.fixture(scope="module")
-def certificate(url, workspace) -> Union[Path, bool]:
+def certificate(url, workspace) -> Optional[Path]:
     """Get the web app certificate."""
     if "https" not in url:
-        return False  # Do not check
+        return None  # Do not check
 
     if "localhost" in url:
-        return False  # Do not check
+        return None  # Do not check
 
-    hostname = url.split("https://")[-1]
+    hostname, port = url_parse(url)
+
     cert_path: Path = workspace / "cert.pem"
 
     if cert_path.exists():
-        if cert_path.read_text() == "1":
-            return True  # Use the ssl bundle from the system
         return cert_path  # Use this specific bundle
 
-    pem = get_server_certificate((hostname, 443))
-    cert = x509.load_pem_x509_certificate(pem.encode("utf8"))
-    if cert.subject == cert.issuer:  # self signed certificate
-        # save it for future use
-        cert_path.write_bytes(pem.encode("utf-8"))
-    else:
-        cert_path.write_text("1")
-        return True
+    pem = get_server_certificate((hostname, port))
+    cert_path.write_bytes(pem.encode("utf-8"))
 
     return cert_path

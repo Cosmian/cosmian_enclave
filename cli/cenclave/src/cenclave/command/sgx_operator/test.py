@@ -58,12 +58,15 @@ def run(args) -> None:
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
     try:
+        env = dict(os.environ)
+
+        if "TEST_REMOTE_URL" not in os.environ:
+            env["TEST_REMOTE_URL"] = f"https://{docker.host}:{docker.port}"
+
         subprocess.check_call(
             [sys.executable, "-m", code_config.tests_cmd],
             cwd=args.test,
-            env=dict(
-                os.environ, TEST_REMOTE_URL=f"https://{docker.host}:{docker.port}"
-            ),
+            env=env,
         )
 
         LOG.info("Tests successful")
