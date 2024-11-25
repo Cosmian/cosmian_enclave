@@ -14,7 +14,7 @@ def add_subparser(subparsers):
     """Define the subcommand."""
     parser = subparsers.add_parser(
         "seal",
-        help="seal file using NaCl's Seal Box."
+        help="seal file using NaCl sealed box. "
         "Recipient is either raw X25519 public key or "
         "extracted from RA-TLS certificate with enclave's "
         "public key in REPORT_DATA field of SGX quote",

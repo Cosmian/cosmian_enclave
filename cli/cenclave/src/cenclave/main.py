@@ -12,6 +12,7 @@ import cenclave
 from cenclave.command.code_provider import (
     decrypt,
     encrypt,
+    keygen,
     localtest,
     package,
     scaffold,
@@ -50,6 +51,7 @@ def main() -> int:
 
     subparsers = parser.add_subparsers(title="commands")
 
+    keygen.add_subparser(subparsers)
     encrypt.add_subparser(subparsers)
     decrypt.add_subparser(subparsers)
     evidence.add_subparser(subparsers)
