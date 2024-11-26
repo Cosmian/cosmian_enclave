@@ -1,6 +1,7 @@
 """Unit test for our app."""
 
 import base64
+import struct
 
 import requests
 from cenclave_lib_crypto.seal_box import unseal
@@ -35,18 +36,20 @@ def test_participants(url, certificate, pk1, pk1_b64, pk2, pk2_b64):
 
 
 def test_richest(url, certificate, pk1_b64, sk1, pk2_b64, sk2):
+    n_b64 = base64.b64encode(struct.pack("<d", float(97))).decode("utf-8")
     response = requests.post(
         url,
-        json={"pk": pk1_b64, "n": float(97)},
+        json={"pk": pk1_b64, "data": {"encrypted": False, "n": n_b64}},
         timeout=10,
         verify=certificate,
     )
 
     assert response.status_code == 200
 
+    n_b64 = base64.b64encode(struct.pack("<d", float(97.1))).decode("utf-8")
     response = requests.post(
         url,
-        json={"pk": pk2_b64, "n": float(97.1)},
+        json={"pk": pk2_b64, "data": {"encrypted": False, "n": n_b64}},
         timeout=10,
         verify=certificate,
     )
