@@ -1,8 +1,9 @@
 """Conftest."""
 
+import base64
 import os
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 import pytest
 from intel_sgx_ra.ratls import get_server_certificate, url_parse
@@ -57,44 +58,48 @@ def certificate(url, workspace) -> Optional[Path]:
 
 
 @pytest.fixture(scope="module")
-def pk1() -> bytes:
+def keypair1_path() -> bytes:
+    """Path of the participant 1 keypair."""
+    return Path(__file__).parent / "data" / "keypair1.bin"
+
+
+@pytest.fixture(scope="module")
+def keypair2_path() -> bytes:
+    """Path of the participant 2 keypair."""
+    return Path(__file__).parent / "data" / "keypair2.bin"
+
+
+@pytest.fixture(scope="module")
+def pk1(keypair1_path) -> bytes:
     """Bytes of the public key of the participant 1."""
-    return bytes.fromhex(
-        "938b3e0e60ebbdbbd4348ba6a0468685043d540e332c32e8bc2ca40b858ad209"
-    )
+    return keypair1_path.read_bytes()[:32]
 
 
 @pytest.fixture(scope="module")
-def pk1_b64() -> str:
+def pk1_b64(pk1) -> bytes:
     """Base64 encoded public key of the participant 1."""
-    return "k4s+DmDrvbvUNIumoEaGhQQ9VA4zLDLovCykC4WK0gk="
+    return base64.b64encode(pk1)
 
 
 @pytest.fixture(scope="module")
-def pk2() -> bytes:
+def pk2(keypair2_path) -> bytes:
     """Bytes of the public key of the participant 2."""
-    return bytes.fromhex(
-        "ff8b983287fec6aefcf1b55e8c1efeff984e5b8dfa8d4de62df521bd6ec57d14"
-    )
+    return keypair2_path.read_bytes()[:32]
 
 
 @pytest.fixture(scope="module")
-def pk2_b64() -> str:
+def pk2_b64(pk2) -> bytes:
     """Base64 encoded public key of the participant 2."""
-    return "/4uYMof+xq788bVejB7+/5hOW436jU3mLfUhvW7FfRQ="
+    return base64.b64encode(pk2)
 
 
 @pytest.fixture(scope="module")
-def sk1() -> bytes:
+def sk1(keypair1_path) -> bytes:
     """Bytes of the private key of the participant 1."""
-    return bytes.fromhex(
-        "7957ceed56d44a384cf523619a00b2c129514daf422c0b799105fb2caa23ef97"
-    )
+    return keypair1_path.read_bytes()[32:]
 
 
 @pytest.fixture(scope="module")
-def sk2() -> bytes:
+def sk2(keypair2_path) -> bytes:
     """Bytes of the private key of the participant 2."""
-    return bytes.fromhex(
-        "05e5aa1c56ec3d6bf707893e6a038a825d80a2802fdb565fd8fecb840735a954"
-    )
+    return keypair2_path.read_bytes()[32:]
