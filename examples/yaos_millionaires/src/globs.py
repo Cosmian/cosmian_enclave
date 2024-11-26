@@ -1,3 +1,3 @@
 """globs module."""
 
-POOL: list = []
+POOL: list[tuple[str, float]] = []
