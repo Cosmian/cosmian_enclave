@@ -1,0 +1,24 @@
+---
+# tasks file for pccs_deploy
+- name: Create pccs.conf
+  template:
+    src: pccs.conf.j2
+    dest: /home/{{ defined_user }}/pccs.conf
+    owner: "{{ defined_user }}"
+    group: "{{ defined_user }}"
+    mode: 0664
+
+- name: Run PCCS docker container
+  # you first need to install community.docker collection :
+  # ansible-galaxy collection install community.docker 
+  community.docker.docker_container:
+    name: pccs
+    image: ghcr.io/cosmian/pccs:1687279386
+    pull: true
+    restart_policy: always
+    detach: true
+    state: started
+    ports:
+      - "8081:8081"
+    volumes:
+      - /home/{{ defined_user }}/pccs.conf:/opt/intel/sgx-dcap-pccs/config/default.json
