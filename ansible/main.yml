@@ -1,4 +1,28 @@
+
 ---
+# - name: Collect and display virtualization facts
+#   hosts: all
+#   tasks:
+#     - name: Gather facts
+#       ansible.builtin.setup:
+
+#     - name: Display virtualization facts
+#       ansible.builtin.debug:
+#         var: ansible_facts['virtualization_type']
+
+#     - name: Display all virtualization-related facts
+#       ansible.builtin.debug:
+#         var: ansible_facts['virtualization_role']
+
+#     - name: Display all virtualization-related facts
+#       ansible.builtin.debug:
+#         var: ansible_facts['virtualization_vendor']
+
+#     - name: Display all virtualization-related facts
+#       ansible.builtin.debug:
+#         var: ansible_facts['virtualization_technology']
+
+
 - name: Cosmian Enclave installation on Ubuntu
   hosts: all
   become: true
@@ -22,3 +46,7 @@
     - name: Always include install_cenclave role
       ansible.builtin.include_role:
         name: install_cenclave
+
+    - name: Run validation_test
+      ansible.builtin.include_role:
+        name: validation_test
