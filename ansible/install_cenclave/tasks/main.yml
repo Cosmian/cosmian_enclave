@@ -20,7 +20,31 @@
       - "/home/{{ ansible_user }}/.config/gramine/enclave-key.pem"
       - 3072
 
-- name: Install Cosmian Enclave CLI
-  pip:
-    name : cenclave
-    extra_args: --upgrade
+- name: Check Ubuntu version
+  ansible.builtin.debug:
+    msg: "Ubuntu version is {{ ansible_distribution_version }}"
+
+- name: Install pipx and Cosmian Enclave CLI for Ubuntu 24.04
+  block:
+    - name: Install pipx
+      ansible.builtin.apt:
+        name: pipx
+        state: present
+
+    - name: Ensure pipx is installed
+      ansible.builtin.command:
+        cmd: pipx ensurepath
+
+    - name: Install Cosmian Enclave CLI using pipx
+      community.general.pipx:
+        name: cenclave
+        state: latest
+  when: ansible_distribution_version == "24.04"
+
+- name: Install Cosmian Enclave CLI for Ubuntu 22.04
+  block:
+    - name: Install Cosmian Enclave CLI using pip
+      ansible.builtin.pip:
+        name: cenclave
+        extra_args: --upgrade
+  when: ansible_distribution_version == "22.04"

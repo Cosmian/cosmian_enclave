@@ -23,15 +23,16 @@
 #         var: ansible_facts['virtualization_technology']
 
 
+
+
 - name: Cosmian Enclave installation on Ubuntu
   hosts: all
   become: true
-
   pre_tasks:
     - name: Check if the machine is bare-metal
       ansible.builtin.set_fact:
         is_baremetal: "{{ ansible_facts['virtualization_type'] == 'baremetal' }}"
-  
+ 
   roles:
     - update_ubuntu
     - install_docker
