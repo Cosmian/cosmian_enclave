@@ -1,6 +1,11 @@
 ---
 # tasks file for install_sgx_deps
 
+- name: Debug ansible_facts
+  ansible.builtin.debug:
+    var: ansible_facts
+
+
 - name: Add official Intel APT repository
   block:
     - name: Download Intel GPG public key
@@ -39,7 +44,7 @@
 
 - name: Determine template based on environment
   ansible.builtin.template:
-    src: "{{ 'azure_sgx_default_qcnl.conf.j2' if ansible_facts['virtualization_type'] == 'hyperv' else 'baremetal_sgx_default_qcnl.conf.j2' }}"
+    src: "{{ 'azure_sgx_default_qcnl.conf.j2' if ansible_facts['virtualization_role'] == 'guest' else 'baremetal_sgx_default_qcnl.conf.j2' }}"
     dest: /etc/sgx_default_qcnl.conf
     owner: root
     group: root
