@@ -1,0 +1,41 @@
+---
+# tasks file for install_docker
+
+- name: Add official Docker APT repository
+  block:
+    - name: Download Docker GPG public key
+      ansible.builtin.apt_key:
+        state: present
+        url: https://download.docker.com/linux/ubuntu/gpg 
+        keyring: /etc/apt/trusted.gpg.d/docker.gpg
+
+    - name: Add Docker APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+        update_cache: yes
+
+- name: Install Docker packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+  tags: dockinstall
+
+- name: Start Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user to group docker
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes

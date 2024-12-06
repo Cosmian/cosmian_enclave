@@ -37,14 +37,25 @@
     name: aesmd
     state: stopped
 
-- name: Edit sgx_default_qcnl.conf
+- name: Determine template based on environment
   ansible.builtin.template:
-    src: sgx_default_qcnl.conf.j2
+    src: "{{ 'azure_sgx_default_qcnl.conf.j2' if ansible_facts['virtualization_role'] == 'guest' else 'baremetal_sgx_default_qcnl.conf.j2' }}"
     dest: /etc/sgx_default_qcnl.conf
     owner: root
     group: root
     mode: 0644
   tags: qcnl
+
+- name: "Edit network_setting.conf"
+  ansible.builtin.template:
+    src: network_setting.conf.j2
+    dest: /opt/intel/sgx-pck-id-retrieval-tool/network_setting.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_aesmd
+  tags: netset
+  when: ansible_facts['virtualization_type'] == 'baremetal'
 
 - name: Add aesmd user to sgx_prv group
   ansible.builtin.user:
