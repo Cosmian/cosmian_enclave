@@ -1,0 +1,33 @@
+{
+    "HTTPS_PORT" : 8081,
+    "hosts" : "127.0.0.1",
+    "uri": "https://api.trustedservices.intel.com/sgx/certification/v4/",
+    "ApiKey" : "{{ pccs_apikey }}",
+    "proxy" : "",
+    "RefreshSchedule": "0 0 1 * * *",
+    "UserTokenHash" : "{{ pccs_usertoken_hash }}",
+    "AdminTokenHash" : "{{ pccs_admintoken_hash }}",
+    "CachingFillMode" : "REQ",
+    "LogLevel" : "info",
+    "DB_CONFIG" : "{{ pccs_db_config }}",
+    "sqlite" : {
+        "database" : "{{ pccs_sqlite_db_name }}",
+        "username" : "{{ pccs_sqlite_cr_usr }}",
+        "password" : "{{ pccs_sqlite_usr_psswd }}",
+        "options" : {
+            "host": "{{ pccs_sqlite_options_host }}",
+            "dialect": "{{ pccs_sqlite_port_dialect }}",
+            "pool": {
+                "max": {{ pccs_sqlite_port_pool_max }},
+                "min": {{ pccs_sqlite_port_pool_min }},
+                "acquire": {{ pccs_sqlite_port_pool_acquire }},
+                "idle": {{ pccs_sqlite_port_pool_idle }}
+            },
+            "define": {
+                "freezeTableName": {{ pccs_sqlite_define_freezeTableName }}
+            },
+            "logging" : {{ pccs_sqlite_logging }},
+            "storage": "{{ pccs_sqlite_storage }}"
+        }
+    }
+}

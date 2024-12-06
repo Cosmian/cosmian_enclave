@@ -1,29 +1,5 @@
 
 ---
-# - name: Collect and display virtualization facts
-#   hosts: all
-#   tasks:
-#     - name: Gather facts
-#       ansible.builtin.setup:
-
-#     - name: Display virtualization facts
-#       ansible.builtin.debug:
-#         var: ansible_facts['virtualization_type']
-
-#     - name: Display all virtualization-related facts
-#       ansible.builtin.debug:
-#         var: ansible_facts['virtualization_role']
-
-#     - name: Display all virtualization-related facts
-#       ansible.builtin.debug:
-#         var: ansible_facts['virtualization_vendor']
-
-#     - name: Display all virtualization-related facts
-#       ansible.builtin.debug:
-#         var: ansible_facts['virtualization_technology']
-
-
-
 
 - name: Cosmian Enclave installation on Ubuntu
   hosts: all
@@ -31,7 +7,7 @@
   pre_tasks:
     - name: Check if the machine is bare-metal
       ansible.builtin.set_fact:
-        is_baremetal: "{{ ansible_facts['virtualization_type'] == 'baremetal' }}"
+        is_baremetal: "{{ ansible_facts['virtualization_type'] == 'kvm' }}"
  
   roles:
     - update_ubuntu
@@ -39,6 +15,7 @@
     - install_sgx_deps
 
   tasks:
+
     - name: Include role install_pccs for bare-metal only
       ansible.builtin.include_role:
         name: install_pccs

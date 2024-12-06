@@ -1,12 +1,15 @@
+defined_user: "ubuntu"
+
+
 ### PCCS Configuration ###
 
 pccs_db_config: "sqlite"
-pccs_nginx_user: "tech@cosmian.com"
+#pccs_nginx_user: "tech@cosmian.com"
 pccs_usertoken_hash: "82b06127a36cbb2bbe94db6afd798fbf2bbf2ac865344ba2c2ce72e0f9a6cc6deae79ea69de71d036f508f1220ee406431f5d0016f458f713dcfdec4a5b11d21"
 pccs_admintoken_hash: "7cda3d1cb020cdbc3c08e2d606b26ef52de6feece212ebdcfffdee6391e5336d52b653be936bba11f117e89323ae66525a47766848e4df98f3e4dbf454e96ea4"
-pccs_apikey: "03f61d85216b4d0f8587603618c68dc4"
+pccs_apikey: "cc552bb174fc4aa3899ec8bf52e796f6"
 pccs_domain_name: "pccs-client-chu.cosmian.com"
-
+pccs_sqlite_cr_usr: "{{ defined_user }}"
 
 ### sqlite Configuration ###
 
@@ -27,7 +30,7 @@ pccs_sqlite_define_freezeTableName: "true" # Default
 pccs_sqlite_logging: "false" # Default
 pccs_sqlite_storage: "pckcache.db"
 
-### SGX Settings ###
+# ### SGX Settings ###
 
-__pccs: "pccs.mse.cosmian.com"
-__usertoken: ":{cKu=z$8wCB~TKCb:"
+# __pccs: "pccs.mse.cosmian.com"
+# __usertoken: ":{cKu=z$8wCB~TKCb:"

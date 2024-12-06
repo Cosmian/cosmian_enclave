@@ -24,21 +24,39 @@
   ansible.builtin.debug:
     msg: "Ubuntu version is {{ ansible_distribution_version }}"
 
+- name: Print ansible_user
+  ansible.builtin.debug:
+    msg: "Ansible user is {{ ansible_user }}"
+
 - name: Install pipx and Cosmian Enclave CLI for Ubuntu 24.04
   block:
     - name: Install pipx
       ansible.builtin.apt:
         name: pipx
-        state: present
-
-    - name: Ensure pipx is installed
-      ansible.builtin.command:
-        cmd: pipx ensurepath
+        state: latest
 
     - name: Install Cosmian Enclave CLI using pipx
+      become: false
       community.general.pipx:
         name: cenclave
         state: latest
+
+    - name: Ensure pipx is installed
+      become: false
+      ansible.builtin.command:
+        cmd: pipx ensurepath
+
+    - name: Verify cenclave is available
+      become: false
+      ansible.builtin.command:
+        cmd: cenclave --version
+      register: cenclave_version
+      ignore_errors: false
+
+    - name: Debug cenclave version
+      ansible.builtin.debug:
+        msg: "cenclave version: {{ cenclave_version.stdout }}"
+
   when: ansible_distribution_version == "24.04"
 
 - name: Install Cosmian Enclave CLI for Ubuntu 22.04
@@ -47,4 +65,16 @@
       ansible.builtin.pip:
         name: cenclave
         extra_args: --upgrade
+
+    - name: Verify cenclave is available
+      become: false
+      ansible.builtin.command:
+        cmd: cenclave --version
+      register: cenclave_version
+      ignore_errors: false
+
+    - name: Debug cenclave version
+      ansible.builtin.debug:
+        msg: "cenclave version: {{ cenclave_version.stdout }}"
+
   when: ansible_distribution_version == "22.04"
