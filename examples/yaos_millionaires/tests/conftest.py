@@ -6,27 +6,14 @@ from pathlib import Path
 from typing import Optional
 
 import pytest
+import requests
 from intel_sgx_ra.ratls import get_server_certificate, url_parse
 
 
 @pytest.fixture(scope="module")
 def url() -> str:
     """Get the url of the web app."""
-    return os.getenv("TEST_REMOTE_URL", "http://localhost:5000")
-
-
-@pytest.fixture(scope="module")
-def secret_json() -> Optional[Path]:
-    """Get the secret.json path."""
-    e = os.getenv("TEST_SECRET_JSON")
-    return Path(e) if e else None
-
-
-@pytest.fixture(scope="module")
-def sealed_secret_json() -> Optional[Path]:
-    """Get the sealed_secret.json path."""
-    e = os.getenv("TEST_SEALED_SECRET_JSON")
-    return Path(e) if e else None
+    return os.getenv("TEST_URL", "http://localhost:5000")
 
 
 @pytest.fixture(scope="module")
@@ -55,6 +42,15 @@ def certificate(url, workspace) -> Optional[Path]:
     cert_path.write_bytes(pem.encode("utf-8"))
 
     return cert_path
+
+
+@pytest.fixture(scope="module")
+def session(certificate) -> requests.Session:
+    session = requests.Session()
+    if certificate:
+        session.verify = f"{certificate}"
+
+    return session
 
 
 @pytest.fixture(scope="module")

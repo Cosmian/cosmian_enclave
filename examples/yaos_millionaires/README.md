@@ -95,7 +95,7 @@ $ cenclave seal --input secrets_to_seal.json --receiver-enclave ratls.pem --outp
 ### Run your application
 
 ```console
-$ cenclave run  yaos_millionaires
+$ cenclave run yaos_millionaires
 ```
 
 Note: if the code is encrypted, sealed secrets must be added to the command with `--sealed-secrets sealed_secrets.json.enc`.
