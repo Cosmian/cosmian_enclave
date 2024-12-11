@@ -114,7 +114,7 @@ def verify(url: str, pccs_url: Optional[str] = None) -> tuple[Path, bytes, bytes
     quote: Quote = ratls_verify_from_url(url)
 
     if pccs_url:
-        _ = verify_quote(quote, None, pccs_url)
+        verify_quote(quote, None, pccs_url)
     else:  # try Azure Cloud
         maa_result: Dict[str, Any] = azure_verify_quote(quote)
         logging.debug("Microsoft Azure Attestation response: %s", maa_result)
