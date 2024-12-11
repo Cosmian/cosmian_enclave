@@ -41,7 +41,7 @@ $ cenclave localtest --code src/ \
                      --test tests/
 ```
 
-### Create a package for Cosmian Enclave
+### Create an archive for Cosmian Enclave
 
 ```console
 $ cenclave package --code src/ \
