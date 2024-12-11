@@ -7,19 +7,15 @@ import requests
 from cenclave_lib_crypto.seal_box import unseal
 
 
-def test_health(url, certificate):
+def test_health(url, session):
     """Test healthcheck endpoint."""
-    response = requests.get(f"{url}/health", timeout=10, verify=certificate)
+    response = session.get(f"{url}/health", timeout=10)
     assert response.status_code == 200
 
 
-def test_participants(url, certificate, pk1, pk1_b64, pk2, pk2_b64):
+def test_participants(url, session, pk1, pk1_b64, pk2, pk2_b64):
     """Test participants endpoint."""
-    response = requests.get(
-        f"{url}/participants",
-        timeout=10,
-        verify=certificate,
-    )
+    response = session.get(f"{url}/participants", timeout=10)
 
     assert response.status_code == 200
 
@@ -35,32 +31,32 @@ def test_participants(url, certificate, pk1, pk1_b64, pk2, pk2_b64):
     assert pk2_b64.decode("utf-8") in result["participants"]
 
 
-def test_richest(url, certificate, pk1_b64, sk1, pk2_b64, sk2):
+def test_richest(url, session, pk1_b64, sk1, pk2_b64, sk2):
+    # reset first
+    response = session.delete(f"{url}", timeout=10)
+    assert response.status_code == 200
+
     n_b64 = base64.b64encode(struct.pack("<d", float(97))).decode("utf-8")
-    response = requests.post(
+    response = session.post(
         url,
         json={"pk": pk1_b64.decode("utf-8"), "data": {"encrypted": False, "n": n_b64}},
         timeout=10,
-        verify=certificate,
     )
 
     assert response.status_code == 200
 
     n_b64 = base64.b64encode(struct.pack("<d", float(97.1))).decode("utf-8")
-    response = requests.post(
+    response = session.post(
         url,
         json={"pk": pk2_b64.decode("utf-8"), "data": {"encrypted": False, "n": n_b64}},
         timeout=10,
-        verify=certificate,
     )
 
     assert response.status_code == 200
 
     # test result with pk1
-    response = requests.post(
-        url=f"{url}/richest",
-        json={"recipient_pk": pk1_b64.decode("utf-8")},
-        verify=certificate,
+    response = session.post(
+        url=f"{url}/richest", json={"recipient_pk": pk1_b64.decode("utf-8")}
     )
 
     assert response.status_code == 200
@@ -77,10 +73,8 @@ def test_richest(url, certificate, pk1_b64, sk1, pk2_b64, sk2):
     assert base64.b64encode(pk_winner) == pk2_b64
 
     # test result with pk2
-    response = requests.post(
-        url=f"{url}/richest",
-        json={"recipient_pk": pk2_b64.decode("utf-8")},
-        verify=certificate,
+    response = session.post(
+        url=f"{url}/richest", json={"recipient_pk": pk2_b64.decode("utf-8")}
     )
 
     assert response.status_code == 200
