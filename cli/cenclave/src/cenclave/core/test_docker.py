@@ -14,11 +14,13 @@ class TestDockerConfig(BaseModel):
     application: str
     sealed_secrets: Optional[Path]
     secrets: Optional[Path]
+    simu_enclave_sk: Optional[Path]
 
     secret_mountpoint: ClassVar[str] = "/root/.cache/cenclave/secrets.json"
     sealed_secrets_mountpoint: ClassVar[str] = (
         "/root/.cache/cenclave/sealed_secrets.json"
     )
+    enclave_sk_mountpoint: ClassVar[str] = "/key/enclave.key"
 
     code_mountpoint: ClassVar[str] = "/app"
     entrypoint: ClassVar[str] = "cenclave-test"
@@ -49,6 +51,12 @@ class TestDockerConfig(BaseModel):
         if self.sealed_secrets:
             v[f"{self.sealed_secrets.resolve()}"] = {
                 "bind": TestDockerConfig.sealed_secrets_mountpoint,
+                "mode": "rw",
+            }
+
+        if self.simu_enclave_sk:
+            v[f"{self.simu_enclave_sk.resolve()}"] = {
+                "bind": TestDockerConfig.enclave_sk_mountpoint,
                 "mode": "rw",
             }
 

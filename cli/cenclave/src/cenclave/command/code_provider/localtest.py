@@ -2,7 +2,7 @@
 
 import argparse
 from pathlib import Path
-from typing import Optional
+from typing import Optional, cast
 
 from docker.errors import BuildError
 
@@ -57,6 +57,12 @@ def add_subparser(subparsers):
     )
 
     parser.add_argument(
+        "--simu-enclave-keypair",
+        type=Path,
+        help="path with the keypair of the enclave for simulation",
+    )
+
+    parser.add_argument(
         "--no-tests",
         action="store_true",
         help="do not run the tests: just start the docker",
@@ -65,6 +71,7 @@ def add_subparser(subparsers):
     parser.set_defaults(func=run)
 
 
+# pylint: disable=too-many-statements
 def run(args) -> None:
     """Run the subcommand."""
     code_path: Path
@@ -126,6 +133,13 @@ def run(args) -> None:
     if sealed_secrets_path and not sealed_secrets_path.is_file():
         raise FileNotFoundError(f"`{sealed_secrets_path}` does not exist")
 
+    enclave_sk_path: Optional[Path] = None
+
+    if enclave_keypair_path := args.simu_enclave_keypair:
+        enclave_sk: bytes = enclave_keypair_path.read_bytes()[32:]
+        enclave_sk_path = enclave_keypair_path.parent / "enclave.key"
+        cast(Path, enclave_sk_path).write_bytes(enclave_sk)
+
     code_config = AppConf.load(config_path, option=AppConfParsingOption.SkipCloud)
     container_name = docker_name = f"{code_config.name}_test"
 
@@ -139,6 +153,7 @@ def run(args) -> None:
         application=code_config.python_application,
         secrets=secrets_path,
         sealed_secrets=sealed_secrets_path,
+        simu_enclave_sk=enclave_sk_path,
         port=5000,
     )
 
