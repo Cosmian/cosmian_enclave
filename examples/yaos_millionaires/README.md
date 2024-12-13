@@ -39,6 +39,7 @@ $ cenclave localtest --code src/ \
                      --dockerfile Dockerfile \
                      --config config.toml \
                      --test tests/
+                     --simu-enclave-keypair tests/data/keypair_enclave.bin
 ```
 
 ### Create an archive for Cosmian Enclave

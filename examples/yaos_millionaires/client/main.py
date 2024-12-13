@@ -54,21 +54,13 @@ def push(
     enclave_pk: Optional[bytes] = None,
 ) -> None:
     encoded_n: bytes = struct.pack("<d", float(n))
-
-    if enclave_pk is not None:
-        encrypted_n: bytes = seal(encoded_n, enclave_pk)
-        data = {
-            "encrypted": True,
-            "n": base64.b64encode(encrypted_n).decode("utf-8"),
-        }
-    else:
-        data = {"encrypted": False, "n": base64.b64encode(encoded_n).decode("utf-8")}
+    encrypted_n: bytes = seal(encoded_n, enclave_pk)
 
     response: requests.Response = session.post(
         url=url,
         json={
             "pk": base64.b64encode(pk).decode("utf-8"),
-            "data": data,
+            "data": {"n": base64.b64encode(encrypted_n).decode("utf-8")},
         },
     )
 
