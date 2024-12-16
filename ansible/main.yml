@@ -1,9 +1,30 @@
+
 ---
+
 - name: Cosmian Enclave installation on Ubuntu
   hosts: all
   become: true
+  pre_tasks:
+    - name: Check if the machine is bare-metal
+      ansible.builtin.set_fact:
+        is_baremetal: "{{ ansible_facts['virtualization_type'] == 'kvm' }}"
+ 
   roles:
     - update_ubuntu
-    - install_sgx_deps
     - install_docker
-    - install_cenclave
+    - install_sgx_deps
+
+  tasks:
+
+    - name: Include role install_pccs for bare-metal only
+      ansible.builtin.include_role:
+        name: install_pccs
+      when: is_baremetal
+
+    - name: Always include install_cenclave role
+      ansible.builtin.include_role:
+        name: install_cenclave
+
+    - name: Run validation_test
+      ansible.builtin.include_role:
+        name: validation_test

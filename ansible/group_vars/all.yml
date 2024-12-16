@@ -1,0 +1,36 @@
+defined_user: "ubuntu"
+
+
+### PCCS Configuration ###
+
+pccs_db_config: "sqlite"
+#pccs_nginx_user: "tech@cosmian.com"
+pccs_usertoken_hash: "82b06127a36cbb2bbe94db6afd798fbf2bbf2ac865344ba2c2ce72e0f9a6cc6deae79ea69de71d036f508f1220ee406431f5d0016f458f713dcfdec4a5b11d21"
+pccs_admintoken_hash: "7cda3d1cb020cdbc3c08e2d606b26ef52de6feece212ebdcfffdee6391e5336d52b653be936bba11f117e89323ae66525a47766848e4df98f3e4dbf454e96ea4"
+pccs_apikey: "cc552bb174fc4aa3899ec8bf52e796f6"
+pccs_domain_name: "pccs-client-chu.cosmian.com"
+pccs_sqlite_cr_usr: "{{ defined_user }}"
+
+### sqlite Configuration ###
+
+pccs_sqlite_root_psswd: "QJxGmCnmbEahoE6B2cKYSPigRCtiaQdppivRC2M9c69BRYdGc5aSS8WUPWEnmCErjRbJUGpKe7nadeR68buemEoyYVKeytoidZcsLoL26ugyk56dR2ZhRpgX6pmW4KME"
+pccs_sqlite_usr_psswd: "Kd6AJ5482s4f7KVFMQsp3FkFAwixjGKMXQo4Vzse7umaMZqK93XyoaYZZwQxTJCZSoxGHNWoAVFHso4YZxck5Bzg7VmEDQdJ897hpmpNPLiE3gU4A8uHL4dkzpEoSjuy"
+pccs_sqlite_db_name: "pckcache.db"
+
+### PCCS File Tuning configuration
+pccs_sqlite_options_host: "localhost" # Default
+pccs_sqlite_port: "3306" # Default
+pccs_sqlite_port_dialect: "sqlite" # Default
+pccs_caching_fill_mode: "REQ"
+pccs_sqlite_port_pool_max: "5" # Default  
+pccs_sqlite_port_pool_min: "0" # Default
+pccs_sqlite_port_pool_acquire: "30000" # Default
+pccs_sqlite_port_pool_idle: "10000" # Default
+pccs_sqlite_define_freezeTableName: "true" # Default
+pccs_sqlite_logging: "false" # Default
+pccs_sqlite_storage: "pckcache.db"
+
+# ### SGX Settings ###
+
+# __pccs: "pccs.mse.cosmian.com"
+# __usertoken: ":{cKu=z$8wCB~TKCb:"
