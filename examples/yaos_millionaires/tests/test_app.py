@@ -3,8 +3,7 @@
 import base64
 import struct
 
-import requests
-from cenclave_lib_crypto.seal_box import unseal
+from cenclave_lib_crypto.seal_box import unseal, seal
 
 
 def test_health(url, session):
@@ -31,24 +30,36 @@ def test_participants(url, session, pk1, pk1_b64, pk2, pk2_b64):
     assert pk2_b64.decode("utf-8") in result["participants"]
 
 
-def test_richest(url, session, pk1_b64, sk1, pk2_b64, sk2):
+def test_richest(url, session, pk1_b64, sk1, pk2_b64, sk2, pk_enclave):
     # reset first
     response = session.delete(f"{url}", timeout=10)
     assert response.status_code == 200
 
-    n_b64 = base64.b64encode(struct.pack("<d", float(97))).decode("utf-8")
+    n: float = 97.0
+    encoded_n: bytes = struct.pack("<d", float(n))
+    encrypted_n: bytes = seal(encoded_n, pk_enclave)
+
     response = session.post(
         url,
-        json={"pk": pk1_b64.decode("utf-8"), "data": {"encrypted": False, "n": n_b64}},
+        json={
+            "pk": pk1_b64.decode("utf-8"),
+            "data": {"n": base64.b64encode(encrypted_n).decode("utf-8")},
+        },
         timeout=10,
     )
 
     assert response.status_code == 200
 
-    n_b64 = base64.b64encode(struct.pack("<d", float(97.1))).decode("utf-8")
+    n: float = 97.1
+    encoded_n: bytes = struct.pack("<d", float(n))
+    encrypted_n: bytes = seal(encoded_n, pk_enclave)
+
     response = session.post(
         url,
-        json={"pk": pk2_b64.decode("utf-8"), "data": {"encrypted": False, "n": n_b64}},
+        json={
+            "pk": pk2_b64.decode("utf-8"),
+            "data": {"n": base64.b64encode(encrypted_n).decode("utf-8")},
+        },
         timeout=10,
     )
 

@@ -7,7 +7,7 @@ from typing import Optional
 
 import pytest
 import requests
-from intel_sgx_ra.ratls import get_server_certificate, url_parse
+from intel_sgx_ra.ratls import get_server_certificate, url_parse, get_quote_from_cert
 
 
 @pytest.fixture(scope="module")
@@ -66,6 +66,12 @@ def keypair2_path() -> bytes:
 
 
 @pytest.fixture(scope="module")
+def keypair_enclave_path() -> bytes:
+    """Path of the enclave keypair."""
+    return Path(__file__).parent / "data" / "keypair_enclave.bin"
+
+
+@pytest.fixture(scope="module")
 def pk1(keypair1_path) -> bytes:
     """Bytes of the public key of the participant 1."""
     return keypair1_path.read_bytes()[:32]
@@ -87,6 +93,23 @@ def pk2(keypair2_path) -> bytes:
 def pk2_b64(pk2) -> bytes:
     """Base64 encoded public key of the participant 2."""
     return base64.b64encode(pk2)
+
+
+@pytest.fixture(scope="module")
+def pk_enclave(certificate, keypair_enclave_path) -> bytes:
+    """Bytes of enclave's public key."""
+    if certificate is None:
+        return keypair_enclave_path.read_bytes()[:32]
+
+    quote = get_quote_from_cert(certificate.read_bytes())
+
+    return quote.report_body.report_data[32:]
+
+
+@pytest.fixture(scope="module")
+def pk_enclave_b64(pk_enclave) -> bytes:
+    """Base64 encoded enclave's public key."""
+    return base64.b64encode(pk_enclave)
 
 
 @pytest.fixture(scope="module")

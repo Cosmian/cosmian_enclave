@@ -17,11 +17,7 @@ app = Flask(__name__)
 
 CONFIG = json.loads((Path(__file__).parent / "config.json").read_text(encoding="utf-8"))
 
-ENCLAVE_SK: Optional[bytes] = (
-    Path(os.environ["ENCLAVE_SK_PATH"]).read_bytes()
-    if "ENCLAVE_SK_PATH" in os.environ
-    else None
-)
+ENCLAVE_SK: bytes = Path(os.environ["ENCLAVE_SK_PATH"]).read_bytes()
 
 
 @app.get("/health")
@@ -62,10 +58,7 @@ def push() -> Response:
         app.logger.error("Public key already pushed data")
         return Response(status=HTTPStatus.CONFLICT)
 
-    n: bytes = base64.b64decode(data["n"])
-
-    if data["encrypted"] and ENCLAVE_SK:
-        n = unseal(n, ENCLAVE_SK)
+    n: bytes = unseal(base64.b64decode(data["n"]), ENCLAVE_SK)
 
     deser_n, *_ = struct.unpack("<d", n)
     globs.POOL.append((pk, deser_n))
