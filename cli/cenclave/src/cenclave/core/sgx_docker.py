@@ -1,7 +1,7 @@
 """cenclave.core.sgx_docker module."""
 
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Tuple
+from typing import Any, ClassVar, Dict, List, Optional, Tuple
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -17,6 +17,7 @@ class SgxDockerConfig(BaseModel):
     subject: str
     subject_alternative_name: str
     expiration_date: int
+    client_certificate: Optional[Path]
     app_dir: Path
     application: str
     healthcheck: str
@@ -29,7 +30,7 @@ class SgxDockerConfig(BaseModel):
 
     def cmd(self) -> List[str]:
         """Serialize the docker command args."""
-        return [
+        args = [
             "--size",
             f"{self.size}M",
             "--subject",
@@ -43,6 +44,12 @@ class SgxDockerConfig(BaseModel):
             "--expiration",
             str(self.expiration_date),
         ]
+
+        if client_certificate := self.client_certificate:
+            args.append("--client-certificate")
+            args.append(client_certificate.read_text())
+
+        return args
 
     def ports(self) -> Dict[str, Tuple[str, str]]:
         """Define the docker ports."""
@@ -123,6 +130,7 @@ class SgxDockerConfig(BaseModel):
             subject_alternative_name=data_map["san"],
             app_id=UUID(data_map["id"]),
             expiration_date=int(data_map["expiration"]),
+            client_certificate=data_map.get("client-certificate"),
             app_dir=Path(app["Source"]),
             application=data_map["application"],
             port=int(port["443/tcp"][0]["HostPort"]),

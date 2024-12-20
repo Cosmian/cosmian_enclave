@@ -93,6 +93,12 @@ def add_subparser(subparsers):
     )
 
     parser.add_argument(
+        "--client-certificate",
+        type=Path,
+        help="bundle for client certificate authentication",
+    )
+
+    parser.add_argument(
         "--signer-key",
         type=Path,
         help="enclave signer key",
@@ -157,6 +163,7 @@ def run(args) -> None:
         subject_alternative_name=args.san,
         app_id=uuid4(),
         expiration_date=int((datetime.today() + timedelta(days=args.days)).timestamp()),
+        client_certificate=args.client_certificate,
         app_dir=workspace,
         application=code_config.python_application,
         healthcheck=code_config.healthcheck_endpoint,
