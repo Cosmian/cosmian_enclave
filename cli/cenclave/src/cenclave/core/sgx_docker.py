@@ -17,7 +17,7 @@ class SgxDockerConfig(BaseModel):
     subject: str
     subject_alternative_name: str
     expiration_date: int
-    client_certificate: Optional[Path]
+    client_certificate: Optional[str]
     app_dir: Path
     application: str
     healthcheck: str
@@ -47,7 +47,7 @@ class SgxDockerConfig(BaseModel):
 
         if client_certificate := self.client_certificate:
             args.append("--client-certificate")
-            args.append(client_certificate.read_text())
+            args.append(client_certificate)
 
         return args
 

@@ -163,7 +163,9 @@ def run(args) -> None:
         subject_alternative_name=args.san,
         app_id=uuid4(),
         expiration_date=int((datetime.today() + timedelta(days=args.days)).timestamp()),
-        client_certificate=args.client_certificate,
+        client_certificate=(
+            args.client_certificate.read_text() if args.client_certificate else None
+        ),
         app_dir=workspace,
         application=code_config.python_application,
         healthcheck=code_config.healthcheck_endpoint,
