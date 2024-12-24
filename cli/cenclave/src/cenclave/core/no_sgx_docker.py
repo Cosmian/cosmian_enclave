@@ -15,6 +15,7 @@ class NoSgxDockerConfig(BaseModel):
     subject: str
     subject_alternative_name: str
     expiration_date: Optional[int]
+    client_certificate: Optional[str]
     size: int
     app_id: UUID
     application: str
@@ -24,7 +25,7 @@ class NoSgxDockerConfig(BaseModel):
 
     def cmd(self) -> List[str]:
         """Serialize the docker command args."""
-        command = [
+        args = [
             "--size",
             f"{self.size}M",
             "--subject",
@@ -39,10 +40,14 @@ class NoSgxDockerConfig(BaseModel):
         ]
 
         if self.expiration_date:
-            command.append("--expiration")
-            command.append(str(self.expiration_date))
+            args.append("--expiration")
+            args.append(str(self.expiration_date))
 
-        return command
+        if client_certificate := self.client_certificate:
+            args.append("--client-certificate")
+            args.append(client_certificate)
+
+        return args
 
     def volumes(self, app_path: Path) -> Dict[str, Dict[str, str]]:
         """Define the docker volumes."""
@@ -60,6 +65,7 @@ class NoSgxDockerConfig(BaseModel):
             subject=docker_config.subject,
             subject_alternative_name=docker_config.subject_alternative_name,
             expiration_date=docker_config.expiration_date,
+            client_certificate=docker_config.client_certificate,
             size=docker_config.size,
             app_id=docker_config.app_id,
             application=docker_config.application,
