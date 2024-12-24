@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Iterable, Optional, Union
 from uuid import UUID
 
 import requests
+import urllib3
 from pydantic import BaseModel
 
 from cenclave.core.base64 import base64url_encode
@@ -122,11 +123,15 @@ def is_ready(
 
         if response.status_code != 503 and "Mse-Status" not in response.headers:
             return True
-    except requests.exceptions.Timeout:
+    except (
+        requests.exceptions.Timeout,
+        requests.exceptions.SSLError,
+    ):
         return False
-    except requests.exceptions.SSLError:
-        return False
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as exc:
+        err, *_ = exc.args
+        if isinstance(err, urllib3.exceptions.ProtocolError):
+            return True
         return False
 
     return False
