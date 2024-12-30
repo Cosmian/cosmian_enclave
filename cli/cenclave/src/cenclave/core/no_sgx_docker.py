@@ -16,6 +16,7 @@ class NoSgxDockerConfig(BaseModel):
     subject_alternative_name: str
     expiration_date: Optional[int]
     client_certificate: Optional[str]
+    ssl_verify_mode: Optional[int]
     size: int
     app_id: UUID
     application: str
@@ -26,17 +27,16 @@ class NoSgxDockerConfig(BaseModel):
     def cmd(self) -> List[str]:
         """Serialize the docker command args."""
         args = [
+            "--application",
+            self.application,
             "--size",
             f"{self.size}M",
-            "--subject",
-            self.subject,
             "--san",
             self.subject_alternative_name,
             "--id",
             str(self.app_id),
-            "--application",
-            self.application,
-            "--dry-run",
+            "--subject",
+            self.subject,
         ]
 
         if self.expiration_date:
@@ -44,8 +44,17 @@ class NoSgxDockerConfig(BaseModel):
             args.append(str(self.expiration_date))
 
         if client_certificate := self.client_certificate:
-            args.append("--client-certificate")
-            args.append(client_certificate)
+            if ssl_verify_mode := self.ssl_verify_mode:
+                args.extend(
+                    [
+                        "--client-certificate",
+                        client_certificate,
+                        "--ssl-verify-mode",
+                        str(ssl_verify_mode),
+                    ]
+                )
+
+        args.append("--dry-run")
 
         return args
 
@@ -66,6 +75,7 @@ class NoSgxDockerConfig(BaseModel):
             subject_alternative_name=docker_config.subject_alternative_name,
             expiration_date=docker_config.expiration_date,
             client_certificate=docker_config.client_certificate,
+            ssl_verify_mode=docker_config.ssl_verify_mode,
             size=docker_config.size,
             app_id=docker_config.app_id,
             application=docker_config.application,

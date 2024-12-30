@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Optional, Tuple
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class SgxDockerConfig(BaseModel):
@@ -18,6 +18,7 @@ class SgxDockerConfig(BaseModel):
     subject_alternative_name: str
     expiration_date: int
     client_certificate: Optional[str]
+    ssl_verify_mode: Optional[int]
     app_dir: Path
     application: str
     healthcheck: str
@@ -28,26 +29,47 @@ class SgxDockerConfig(BaseModel):
     docker_label: ClassVar[str] = "cenclave"
     entrypoint: ClassVar[str] = "cenclave-run"
 
+    # pylint: disable=no-self-argument
+    @validator("ssl_verify_mode")
+    def check_ssl_verify_mode(cls, v, values):
+        """Validate ssl_verify_mode with client_certificate."""
+        if "ssl_verify_mode" in values and not values["client_certificate"]:
+            raise ValueError("no client_certificate with ssl_verify_mode")
+
+        if v and (v != 1 or v != 2):
+            raise ValueError(
+                "ssl_verify_mode must be 1 (CERT_OPTIONAL) or 2 (CERT_REQUIRED)"
+            )
+
+        return v
+
     def cmd(self) -> List[str]:
         """Serialize the docker command args."""
         args = [
+            "--application",
+            self.application,
             "--size",
             f"{self.size}M",
-            "--subject",
-            self.subject,
             "--san",
             self.subject_alternative_name,
             "--id",
             str(self.app_id),
-            "--application",
-            self.application,
+            "--subject",
+            self.subject,
             "--expiration",
             str(self.expiration_date),
         ]
 
         if client_certificate := self.client_certificate:
-            args.append("--client-certificate")
-            args.append(client_certificate)
+            if ssl_verify_mode := self.ssl_verify_mode:
+                args.extend(
+                    [
+                        "--client-certificate",
+                        client_certificate,
+                        "--ssl-verify-mode",
+                        str(ssl_verify_mode),
+                    ]
+                )
 
         return args
 
@@ -131,6 +153,7 @@ class SgxDockerConfig(BaseModel):
             app_id=UUID(data_map["id"]),
             expiration_date=int(data_map["expiration"]),
             client_certificate=data_map.get("client-certificate"),
+            ssl_verify_mode=data_map.get("ssl-verify-mode"),
             app_dir=Path(app["Source"]),
             application=data_map["application"],
             port=int(port["443/tcp"][0]["HostPort"]),

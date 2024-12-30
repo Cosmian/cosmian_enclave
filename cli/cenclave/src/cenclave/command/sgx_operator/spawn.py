@@ -99,6 +99,14 @@ def add_subparser(subparsers):
     )
 
     parser.add_argument(
+        "--ssl-verify-mode",
+        type=int,
+        help="Either CERT_OPTIONAL (1) or CERT_REQUIRED (2). Default to CERT_REQUIRED.",
+        choices=[1, 2],
+        default=2,
+    )
+
+    parser.add_argument(
         "--signer-key",
         type=Path,
         help="enclave signer key",
@@ -166,6 +174,7 @@ def run(args) -> None:
         client_certificate=(
             args.client_certificate.read_text() if args.client_certificate else None
         ),
+        ssl_verify_mode=(args.ssl_verify_mode if args.client_certificate else None),
         app_dir=workspace,
         application=code_config.python_application,
         healthcheck=code_config.healthcheck_endpoint,

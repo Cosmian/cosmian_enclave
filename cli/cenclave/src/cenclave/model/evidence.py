@@ -91,6 +91,8 @@ class ApplicationEvidence(BaseModel):
                         if self.input_args.expiration_date
                         else None
                     ),
+                    "client_certificate": self.input_args.client_certificate,
+                    "ssl_verify_mode": self.input_args.ssl_verify_mode,
                     "size": self.input_args.size,
                     "app_id": str(self.input_args.app_id),
                     "application": self.input_args.application,
