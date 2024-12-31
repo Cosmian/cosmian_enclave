@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from cenclave_lib_crypto.seal_box import seal, unseal
+from cryptography import x509
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel
 
@@ -47,12 +48,27 @@ class RichestItemResp(BaseModel):
 
 
 @app.get("/health")
-async def health_check(request: Request) -> Response:
+async def health_check() -> Response:
     """Health check of the application."""
-    if "tls" in request.scope["extensions"]:
-        client_cert = request.scope["extensions"]["tls"]["client_cert_chain"]
-        print(f"client_cert: {client_cert}")
     return Response(status_code=HTTPStatus.OK)
+
+
+@app.get("/who")
+async def who(request: Request) -> Response:
+    """Check CN of client certificate if any."""
+    if "tls" in request.scope["extensions"]:
+        if "client_cert_chain" in request.scope["extensions"]["tls"]:
+            client_cert, *_ = request.scope["extensions"]["tls"]["client_cert_chain"]
+            cert = x509.load_pem_x509_certificate(client_cert.encode("utf-8"))
+            name_attr, *_ = cert.subject.get_attributes_for_oid(
+                x509.NameOID.COMMON_NAME
+            )
+            cn = name_attr.value
+            return Response(
+                content=f"Hello {cn}".encode("utf-8"), status_code=HTTPStatus.OK
+            )
+
+    return Response(status_code=HTTPStatus.UNAUTHORIZED)
 
 
 @app.post("/push")
