@@ -38,7 +38,7 @@ then populate `src/config.json` with participant's public key base64-encoded:
 $ cenclave localtest --code src/ \
                      --dockerfile Dockerfile \
                      --config config.toml \
-                     --test tests/
+                     --test tests/ \
                      --simu-enclave-keypair tests/data/keypair_enclave.bin
 ```
 

@@ -32,7 +32,7 @@ def test_participants(url, session, pk1, pk1_b64, pk2, pk2_b64):
 
 def test_richest(url, session, pk1_b64, sk1, pk2_b64, sk2, pk_enclave):
     # reset first
-    response = session.delete(f"{url}", timeout=10)
+    response = session.delete(url, timeout=10)
     assert response.status_code == 200
 
     n: float = 97.0
@@ -40,10 +40,10 @@ def test_richest(url, session, pk1_b64, sk1, pk2_b64, sk2, pk_enclave):
     encrypted_n: bytes = seal(encoded_n, pk_enclave)
 
     response = session.post(
-        url,
+        f"{url}/push",
         json={
             "pk": pk1_b64.decode("utf-8"),
-            "data": {"n": base64.b64encode(encrypted_n).decode("utf-8")},
+            "data": base64.b64encode(encrypted_n).decode("utf-8"),
         },
         timeout=10,
     )
@@ -55,10 +55,10 @@ def test_richest(url, session, pk1_b64, sk1, pk2_b64, sk2, pk_enclave):
     encrypted_n: bytes = seal(encoded_n, pk_enclave)
 
     response = session.post(
-        url,
+        f"{url}/push",
         json={
             "pk": pk2_b64.decode("utf-8"),
-            "data": {"n": base64.b64encode(encrypted_n).decode("utf-8")},
+            "data": base64.b64encode(encrypted_n).decode("utf-8"),
         },
         timeout=10,
     )

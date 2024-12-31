@@ -57,10 +57,10 @@ def push(
     encrypted_n: bytes = seal(encoded_n, enclave_pk)
 
     response: requests.Response = session.post(
-        url=url,
+        url=f"{url}/push",
         json={
             "pk": base64.b64encode(pk).decode("utf-8"),
-            "data": {"n": base64.b64encode(encrypted_n).decode("utf-8")},
+            "data": base64.b64encode(encrypted_n).decode("utf-8"),
         },
     )
 

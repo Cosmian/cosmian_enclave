@@ -1,6 +1,5 @@
 """Test model/docker.py."""
 
-
 from cenclave.core.sgx_docker import SgxDockerConfig
 
 
@@ -14,6 +13,8 @@ def test_load():
         subject_alternative_name="myapp.fr",
         app_id="4141a3e6-1f2b-4ccf-8610-aa0891a1a210",
         expiration_date=1714639412,
+        client_certificate=None,
+        ssl_verify_mode=None,
         app_dir="/home/cosmian/workspace/sgx_operator/",
         application="app:app",
         healthcheck="/health",
@@ -86,6 +87,8 @@ def test_labels():
         subject_alternative_name="myapp.fr",
         app_id="4141a3e6-1f2b-4ccf-8610-aa0891a1a210",
         expiration_date=1714639412,
+        client_certificate=None,
+        ssl_verify_mode=None,
         app_dir="/home/cosmian/workspace/sgx_operator/",
         application="app:app",
         healthcheck="/health",
@@ -105,6 +108,8 @@ def test_devices():
         subject_alternative_name="myapp.fr",
         app_id="4141a3e6-1f2b-4ccf-8610-aa0891a1a210",
         expiration_date=1714639412,
+        client_certificate=None,
+        ssl_verify_mode=None,
         app_dir="/home/cosmian/workspace/sgx_operator/",
         application="app:app",
         healthcheck="/health",
@@ -129,6 +134,8 @@ def test_ports():
         subject_alternative_name="myapp.fr",
         app_id="4141a3e6-1f2b-4ccf-8610-aa0891a1a210",
         expiration_date=1714639412,
+        client_certificate=None,
+        ssl_verify_mode=None,
         app_dir="/home/cosmian/workspace/sgx_operator/code.tar",
         application="app:app",
         healthcheck="/health",
@@ -148,6 +155,8 @@ def test_volumes():
         subject_alternative_name="myapp.fr",
         app_id="4141a3e6-1f2b-4ccf-8610-aa0891a1a210",
         expiration_date=1714639412,
+        client_certificate=None,
+        ssl_verify_mode=None,
         app_dir="/home/cosmian/workspace/sgx_operator/",
         application="app:app",
         healthcheck="/health",
@@ -180,6 +189,8 @@ def test_cmd():
         subject_alternative_name="myapp.fr",
         app_id="4141a3e6-1f2b-4ccf-8610-aa0891a1a210",
         expiration_date=1714639412,
+        client_certificate=None,
+        ssl_verify_mode=None,
         app_dir="/home/cosmian/workspace/sgx_operator/",
         application="app:app",
         healthcheck="/health",
@@ -187,16 +198,16 @@ def test_cmd():
     )
 
     assert ref_conf.cmd() == [
+        "--application",
+        "app:app",
         "--size",
         "4096M",
-        "--subject",
-        "CN=myapp.fr,O=MyApp Company,C=FR,L=Paris,ST=Ile-de-France",
         "--san",
         "myapp.fr",
         "--id",
         "4141a3e6-1f2b-4ccf-8610-aa0891a1a210",
-        "--application",
-        "app:app",
+        "--subject",
+        "CN=myapp.fr,O=MyApp Company,C=FR,L=Paris,ST=Ile-de-France",
         "--expiration",
         "1714639412",
     ]

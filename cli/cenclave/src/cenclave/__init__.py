@@ -2,7 +2,7 @@
 
 import os
 
-__version__ = "1.0.0a6"
+__version__ = "1.0.0a11"
 
 # PCCS to retrieve collaterals
 PCCS_URL = os.getenv("PCCS_URL", default="https://pccs.cosmian.com")
