@@ -36,7 +36,7 @@ class SgxDockerConfig(BaseModel):
         if "ssl_verify_mode" in values and not values["client_certificate"]:
             raise ValueError("no client_certificate with ssl_verify_mode")
 
-        if v and (v != 1 or v != 2):
+        if v and v not in (1, 2):
             raise ValueError(
                 "ssl_verify_mode must be 1 (CERT_OPTIONAL) or 2 (CERT_REQUIRED)"
             )
