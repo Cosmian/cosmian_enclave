@@ -1,0 +1,49 @@
+---
+# roles/validation_test/tasks/main.yml
+
+- name: Set Docker socket
+  set_fact:
+    ansible_docker_extra_args: "-H unix:///var/run/docker.sock"
+
+- name: Pull Docker image
+  community.docker.docker_image:
+    name: ghcr.io/cosmian/gramine-minimal
+    tag: "20241202140525"
+    source: pull
+
+- name: Run Docker container
+  community.docker.docker_container:
+    name: gramine_minimal
+    image: ghcr.io/cosmian/gramine-minimal:20241202140525
+    devices:
+      - /dev/sgx_enclave
+      - /dev/sgx_provision
+    volumes:
+      - /var/run/aesmd:/var/run/aesmd/
+    state: started
+    interactive: yes
+    tty: yes
+  register: docker_container_info
+
+- name: Wait for the container to be ready
+  command: docker logs gramine_minimal
+  register: docker_logs
+  retries: 15
+  delay: 3
+  until: "'Hello World' in docker_logs.stdout"
+
+- name: Capture the output of the Docker container
+  debug:
+    msg: "Hello World found in the output"
+
+# Clean
+- name: Stop and remove the container
+  community.docker.docker_container:
+    name: gramine_minimal
+    state: absent
+
+- name: Remove Docker image
+  community.docker.docker_image:
+    name: ghcr.io/cosmian/gramine-minimal
+    tag: "20241202140525"
+    state: absent
