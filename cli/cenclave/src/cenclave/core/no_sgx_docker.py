@@ -14,9 +14,9 @@ class NoSgxDockerConfig(BaseModel):
 
     subject: str
     subject_alternative_name: str
-    expiration_date: Optional[int]
-    client_certificate: Optional[str]
-    ssl_verify_mode: Optional[int]
+    expiration_date: Optional[int] = None
+    client_certificate: Optional[str] = None
+    ssl_verify_mode: Optional[int] = None
     size: int
     app_id: UUID
     application: str

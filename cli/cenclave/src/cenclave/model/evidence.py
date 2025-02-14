@@ -17,7 +17,7 @@ from cryptography.x509 import (
     load_pem_x509_certificate,
     load_pem_x509_crl,
 )
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from cenclave.core.no_sgx_docker import NoSgxDockerConfig
 
@@ -33,11 +33,7 @@ class ApplicationEvidence(BaseModel):
     tcb_cert: Certificate
     signer_pk: PublicKeyTypes
     input_args: NoSgxDockerConfig
-
-    class Config:
-        """Overwrite internal structure."""
-
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
     def collaterals(

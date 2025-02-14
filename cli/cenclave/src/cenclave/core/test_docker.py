@@ -12,9 +12,9 @@ class TestDockerConfig(BaseModel):
     port: int
     code: Path
     application: str
-    sealed_secrets: Optional[Path]
-    secrets: Optional[Path]
-    simu_enclave_sk: Optional[Path]
+    sealed_secrets: Optional[Path] = None
+    secrets: Optional[Path] = None
+    simu_enclave_sk: Optional[Path] = None
 
     secret_mountpoint: ClassVar[str] = "/root/.cache/cenclave/secrets.json"
     sealed_secrets_mountpoint: ClassVar[str] = (
