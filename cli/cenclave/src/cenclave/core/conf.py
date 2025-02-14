@@ -1,25 +1,22 @@
 """cenclave.core.conf module."""
 
-from __future__ import annotations
-
 import os
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
 import toml
-from pydantic import BaseModel, constr, validator
+from pydantic import BaseModel, StringConstraints, model_validator
 
 from cenclave.error import BadApplicationInput
 
-if TYPE_CHECKING:
-    Str255 = str
-    Str16 = str
-    StrUnlimited = str
-else:
-    Str255 = constr(min_length=1, max_length=255, strip_whitespace=True)
-    Str16 = constr(min_length=1, max_length=16, strip_whitespace=True)
-    StrUnlimited = constr(min_length=1)
+Str255 = Annotated[
+    str, StringConstraints(min_length=1, max_length=255, strip_whitespace=True)
+]
+Str16 = Annotated[
+    str, StringConstraints(min_length=1, max_length=16, strip_whitespace=True)
+]
+StrUnlimited = Annotated[str, StringConstraints(min_length=1)]
 
 
 def absolute_from_conf_file(conf_file: Path, path: Path) -> Path:
@@ -73,12 +70,11 @@ class AppConf(BaseModel):
     # The package to install before testing the application
     tests_requirements: List[str]
 
-    @validator("healthcheck_endpoint", pre=False)
-    # pylint: disable=no-self-argument,unused-argument
-    def check_healthcheck_endpoint(cls, v: str):
+    @model_validator(mode="after")
+    def check_healthcheck_endpoint(self):
         """Validate that `healthcheck_endpoint` is an endpoint."""
-        if v.startswith("/"):
-            return v
+        if self.healthcheck_endpoint.startswith("/"):
+            return self
         raise ValueError('healthcheck_endpoint should start with a "/"')
 
     # pylint: disable=unused-argument

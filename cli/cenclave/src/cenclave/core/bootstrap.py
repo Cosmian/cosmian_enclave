@@ -16,10 +16,10 @@ class ConfigurationPayload(BaseModel):
     """Definition of the bootstrap server payload."""
 
     app_id: UUID
-    secrets: Optional[Any]
-    sealed_secrets: Optional[bytes]
-    code_secret_key: Optional[bytes]
-    ssl_private_key: Optional[str]
+    secrets: Optional[Any] = None
+    sealed_secrets: Optional[bytes] = None
+    code_secret_key: Optional[bytes] = None
+    ssl_private_key: Optional[str] = None
 
     def payload(self) -> Dict[str, Any]:
         """Build the payload to send to the configuration server."""

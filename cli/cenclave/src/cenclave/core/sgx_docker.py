@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Optional, Tuple
 from uuid import UUID
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, model_validator
 
 
 class SgxDockerConfig(BaseModel):
@@ -17,8 +17,8 @@ class SgxDockerConfig(BaseModel):
     subject: str
     subject_alternative_name: str
     expiration_date: int
-    client_certificate: Optional[str]
-    ssl_verify_mode: Optional[int]
+    client_certificate: Optional[str] = None
+    ssl_verify_mode: Optional[int] = None
     app_dir: Path
     application: str
     healthcheck: str
@@ -29,19 +29,21 @@ class SgxDockerConfig(BaseModel):
     docker_label: ClassVar[str] = "cenclave"
     entrypoint: ClassVar[str] = "cenclave-run"
 
-    # pylint: disable=no-self-argument
-    @validator("ssl_verify_mode")
-    def check_ssl_verify_mode(cls, v, values):
+    @model_validator(mode="after")
+    def check_ssl_verify_mode(self):
         """Validate ssl_verify_mode with client_certificate."""
-        if "ssl_verify_mode" in values and not values["client_certificate"]:
+        if self.ssl_verify_mode is not None and self.client_certificate is None:
             raise ValueError("no client_certificate with ssl_verify_mode")
 
-        if v and v not in (1, 2):
+        if self.client_certificate is not None and self.client_certificate not in (
+            1,
+            2,
+        ):
             raise ValueError(
                 "ssl_verify_mode must be 1 (CERT_OPTIONAL) or 2 (CERT_REQUIRED)"
             )
 
-        return v
+        return self
 
     def cmd(self) -> List[str]:
         """Serialize the docker command args."""
